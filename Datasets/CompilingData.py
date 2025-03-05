@@ -7,3 +7,11 @@ print(data.info())
 
 # Saving data into csv file
 data.to_csv('Datasets/DataSet.csv', index=False)
+
+# Data Analysis:
+Control_Class = data[data['Class'] == 'Control']
+Benign_Class = data[data['Class'] == 'Benign']
+Cancer_Class = data[data['Class'] == 'Cancer']
+print(Control_Class.describe())
+print(Benign_Class.describe())
+print(Cancer_Class.describe())

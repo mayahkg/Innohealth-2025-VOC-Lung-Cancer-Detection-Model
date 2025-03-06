@@ -11,19 +11,17 @@ from tensorflow.keras.layers import Dense, LSTM, Conv2D, MaxPooling2D, Flatten
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 import shap
+from Datasets.CompilingData import *
 
-# Load the dataset
-data = pd.read_csv('path_to_your_dataset.csv')
-
-# Preprocess the dataset
-X = data.drop('target_column', axis=1)  # Features
-y = data['target_column']  # Target variable
-
-# Scaling the features
+# Setting up the Machine Model
+# Setting the column class as the predictor variable 
+X = data.drop('Class', axis=1)  
+y = data['Class']  
+# Scaling the fitting data
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# Encoding class labels
+# Encoding the predictor variable
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(y)
 y_categorical = to_categorical(y_encoded)  # One-hot encoding
@@ -31,6 +29,8 @@ y_categorical = to_categorical(y_encoded)  # One-hot encoding
 # Splitting the dataset
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_categorical, test_size=0.2, random_state=42)
 
+
+# Training the Model
 # SVM Model
 svm_model = SVC(kernel='rbf', probability=True)
 svm_model.fit(X_train, y_train)
@@ -110,5 +110,3 @@ rf_model.fit(X_train, y_encoded)
 explainer = shap.TreeExplainer(rf_model)
 shap_values = explainer.shap_values(X_test)
 shap.summary_plot(shap_values, X_test)
-
-# No ethical considerations needed as data is anonymized and open access

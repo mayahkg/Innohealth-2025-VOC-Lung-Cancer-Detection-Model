@@ -15,3 +15,8 @@ Cancer_Class = data[data['Class'] == 'Cancer']
 print(Control_Class.describe())
 print(Benign_Class.describe())
 print(Cancer_Class.describe())
+
+# Splitting the Data based of their Class
+Control_Class.to_csv('Datasets/ControlSet.csv', index=False)
+Benign_Class.to_csv('Datasets/BenignSet.csv', index=False)
+Cancer_Class.to_csv('Datasets/CancerSet.csv', index=False)

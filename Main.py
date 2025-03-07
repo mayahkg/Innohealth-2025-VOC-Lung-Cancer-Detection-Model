@@ -13,19 +13,15 @@ from tensorflow.keras.utils import to_categorical
 import shap
 from Datasets.CompilingData import *
 
-
 # Setting the column class as the predictor variable 
 X = data.drop('Class', axis=1)  
 y = data['Class']  
 # Scaling the fitting data
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
+X_scaled = StandardScaler().fit_transform(X)
 # Encoding the predictor variable
 label_encoder = LabelEncoder()
 y_encoded = label_encoder.fit_transform(y)
 y_categorical = to_categorical(y_encoded)  # One-hot encoding
-
 # Splitting the dataset
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_categorical, test_size=0.2, random_state=42)
 

@@ -15,25 +15,22 @@ from Datasets.CompilingData import *
 
 # Setting the column class as the predictor variable 
 X = data.drop('Class', axis=1)  
-y = data['Class']  
+Y = data['Class']  
 # Scaling the fitting data
 X_scaled = StandardScaler().fit_transform(X)
 # Encoding the predictor variable
-label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(y)
-y_categorical = to_categorical(y_encoded)  # One-hot encoding
+Y_encoded = to_categorical(LabelEncoder().fit_transform(Y))
 # Splitting the dataset
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_categorical, test_size=0.2, random_state=42)
 
 
-# Training the Model
 # SVM Model
 svm_model = SVC(kernel='rbf', probability=True)
 svm_model.fit(X_train, y_train)
 
 # XGBoost Model
 xgb_model = XGBClassifier(eval_metric='logloss')
-xgb_model.fit(X_train, y_encoded)
+xgb_model.fit(X_train, Y_encoded)
 
 # Feedforward Neural Network
 nn_model = Sequential()

@@ -13,7 +13,7 @@ from tensorflow.keras.utils import to_categorical
 import shap
 from Datasets.CompilingData import *
 
-# Setting up the Machine Model
+
 # Setting the column class as the predictor variable 
 X = data.drop('Class', axis=1)  
 y = data['Class']  

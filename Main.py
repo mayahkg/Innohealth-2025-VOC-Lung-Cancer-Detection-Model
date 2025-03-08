@@ -20,22 +20,32 @@ Y = data['Class']
 X_scaled = StandardScaler().fit_transform(X)
 
 # Encode the target variable
-Y_encoded = LabelEncoder().fit_transform(Y)
+label_encoder = LabelEncoder()
+Y_encoded = label_encoder.fit_transform(Y)  # Fit and transform
+
+# Print a mapping of the encoded values to the original class names
+print("Encoded classes mapping:")
+for index, class_name in enumerate(label_encoder.classes_):
+    print(f"{index}: {class_name}")
 
 # Split the dataset
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, Y_encoded, test_size=0.2, random_state=42)
 
 # Training SVM Model
 svm_model = SVC(kernel='rbf', probability=True)
-svm_model.fit(X_train, y_train)  # Use Y_encoded for training
+svm_model.fit(X_train, y_train)
 
 # Testing SVM Model
 y_pred = svm_model.predict(X_test)
 
+# Convert the predicted labels back to original class names
+y_pred_original = label_encoder.inverse_transform(y_pred)
+y_test_original = label_encoder.inverse_transform(y_test)
+
 # Create a DataFrame to display the actual vs predicted values
 results = pd.DataFrame({
-    'Actual': y_test,
-    'Predicted': y_pred
+    'Actual': y_test_original,
+    'Predicted': y_pred_original
 })
 
 # Print the results in a table-like structure

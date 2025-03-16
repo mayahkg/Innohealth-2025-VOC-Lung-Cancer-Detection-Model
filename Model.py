@@ -16,17 +16,10 @@ data = pd.read_csv('Datasets/LungCancer.txt', delimiter='\t')
 X = data.drop('Class', axis=1)  
 Y = data['Class']  
 
-# Scale the features
+# Setting up the X and Y values
 X_scaled = StandardScaler().fit_transform(X)
-
-# Encode the target variable
 label_encoder = LabelEncoder()
-Y_encoded = label_encoder.fit_transform(Y)  # Fit and transform
-
-# Print a mapping of the encoded values to the original class names
-print("Encoded classes mapping:")
-for index, class_name in enumerate(label_encoder.classes_):
-    print(f"{index}: {class_name}")
+Y_encoded = label_encoder.fit_transform(Y)  
 
 # Split the dataset
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, Y_encoded, test_size=0.2, random_state=42)
@@ -35,21 +28,28 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, Y_encoded, test_si
 svm_model = SVC(kernel='rbf', probability=True)
 svm_model.fit(X_train, y_train)
 
-# Testing SVM Model
-y_pred = svm_model.predict(X_test)
+# Training the XGBoost Model
+xgb_model = XGBClassifier(eval_metric='logloss')
+xgb_model.fit(X_train, y_train)  
 
-# Convert the predicted labels back to original class names
-y_pred_original = label_encoder.inverse_transform(y_pred)
-y_test_original = label_encoder.inverse_transform(y_test)
+# Testing
+models = [("SVM", svm_model), ("XGBoost", xgb_model)]
+results = []
 
-# Create a DataFrame to display the actual vs predicted values
-results = pd.DataFrame({
-    'Actual': y_test_original,
-    'Predicted': y_pred_original
-})
+for model_name, model in models:
+    if model_name == "SVM" or "XGBoost":
+        y_pred = model.predict(X_test)
+    else:
+        raise ValueError(f"Unknown model: {model_name}")
+    accuracy = accuracy_score(y_pred, y_test)
 
-# Print the results in a table-like structure
-print(results)
+    # Store results
+    results.append({
+        'Model': model_name,
+        'Predictions': list(y_pred),
+        'Actual': list(y_test),
+        'Accuracy': accuracy
+    })
 
-# Print the accuracy
-print("Accuracy:", accuracy_score(y_test, y_pred))
+# Print Results
+print(pd.DataFrame(results))

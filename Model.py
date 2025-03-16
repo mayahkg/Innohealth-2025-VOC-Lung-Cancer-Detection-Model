@@ -51,5 +51,7 @@ for model_name, model in models:
         'Accuracy': accuracy
     })
 
-# Print Results
-print(pd.DataFrame(results))
+# Framing Results
+results_df = pd.DataFrame(results)
+print(results_df)
+results_df.to_csv('model_results.csv', index=False)

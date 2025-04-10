@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOC Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: auto; }
+        .voc-container { margin-top: 20px; }
+        .amount-box { margin-top: 10px; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">VOC Tracker</h1>
+        
+        <div class="mb-6">
+            <label for="vocCount" class="block text-lg font-medium text-gray-700">Number of VOCs Detected (10+):</label>
+            <input type="number" id="vocCount" min="10" class="mt-1 block w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="10">
+            <button onclick="generateVOCSelectors()" class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Generate VOC Selectors</button>
+        </div>
+
+        <div id="vocSelectors" class="voc-container"></div>
+        <div id="amountInputs" class="amount-box"></div>
+        <button id="saveBtn" onclick="saveData()" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 hidden">Save Amounts</button>
+        
+        <div id="storedData" class="mt-6"></div>
+    </div>
+
+    <script>
+        const vocList = [
+            "CH2O", "C2H4O", "C3H6O", "C4H8O", "C5H10O", "C6H12O", "C7H14O", "C8H16O", 
+            "C9H18O", "C10H20O", "C11H22O", "C12H24O", "C13H26O", "C4HO8O2", "C2H4O2", 
+            "C3H4O", "C6H10O2", "C9H16O2", "C3H4O2", "C4H6O2", "C4H6O", "C4H4O2", 
+            "C5H8O", "C7H6O", "C7H11O", "C13H22O", "C15H10O"
+        ];
+        let selectedData = {};
+
+        function generateVOCSelectors() {
+            const count = parseInt(document.getElementById("vocCount").value);
+            if (count < 10) {
+                alert("Please enter a number of 10 or greater.");
+                return;
+            }
+
+            const selectorsDiv = document.getElementById("vocSelectors");
+            const amountsDiv = document.getElementById("amountInputs");
+            selectorsDiv.innerHTML = "";
+            amountsDiv.innerHTML = "";
+            selectedData = {};
+
+            for (let i = 0; i < count; i++) {
+                const select = document.createElement("select");
+                select.id = `voc${i}`;
+                select.className = "mt-2 block w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50";
+                select.onchange = () => updateAmountInputs();
+
+                const defaultOption = document.createElement("option");
+                defaultOption.text = "Select VOC";
+                defaultOption.value = "";
+                select.appendChild(defaultOption);
+
+                vocList.forEach(voc => {
+                    const option = document.createElement("option");
+                    option.value = voc;
+                    option.text = voc;
+                    select.appendChild(option);
+                });
+
+                selectorsDiv.appendChild(select);
+            }
+            document.getElementById("saveBtn").classList.remove("hidden");
+        }
+
+        function updateAmountInputs() {
+            const amountsDiv = document.getElementById("amountInputs");
+            amountsDiv.innerHTML = "";
+            selectedData = {};
+
+            const selectors = document.getElementById("vocSelectors").getElementsByTagName("select");
+            for (let selector of selectors) {
+                const voc = selector.value;
+                if (voc && !selectedData[voc]) {
+                    const div = document.createElement("div");
+                    div.className = "mt-2 flex items-center";
+                    
+                    const label = document.createElement("label");
+                    label.textContent = `${voc} Amount: `;
+                    label.className = "mr-2 text-gray-700";
+                    
+                    const input = document.createElement("input");
+                    input.type = "number";
+                    input.id = `amount_${voc}`;
+                    input.min = "0";
+                    input.step = "0.01";
+                    input.className = "w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50";
+                    
+                    div.appendChild(label);
+                    div.appendChild(input);
+                    amountsDiv.appendChild(div);
+                }
+            }
+        }
+
+        function saveData() {
+            const amounts = document.getElementById("amountInputs").getElementsByTagName("input");
+            for (let input of amounts) {
+                const voc = input.id.replace("amount_", "");
+                const amount = parseFloat(input.value) || 0;
+                selectedData[voc] = amount;
+            }
+
+            const storedDiv = document.getElementById("storedData");
+            storedDiv.innerHTML = "<h2 class='text-xl font-semibold mb-2'>Stored VOC Amounts:</h2>";
+            const ul = document.createElement("ul");
+            ul.className = "list-disc pl-5";
+            for (let [voc, amount] of Object.entries(selectedData)) {
+                const li = document.createElement("li");
+                li.textContent = `${voc}: ${amount}`;
+                ul.appendChild(li);
+            }
+            storedDiv.appendChild(ul);
+        }
+    </script>
+</body>
+</html>
